@@ -13,14 +13,14 @@ gcloud compute ssh openclaw-gateway --zone=us-west1-b \
 
 ```bash
 gcloud compute ssh openclaw-gateway --zone=us-west1-b \
-  --command="sudo docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' --filter name=openclaw"
+  --command="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' --filter name=openclaw"
 ```
 
 ## View logs
 
 ```bash
 gcloud compute ssh openclaw-gateway --zone=us-west1-b \
-  --command="sudo docker logs openclaw-gw --tail 50"
+  --command="cd ~/openclaw && docker compose logs --tail 50 openclaw-gateway"
 ```
 
 Change `50` to however many lines needed.
@@ -29,7 +29,7 @@ Change `50` to however many lines needed.
 
 ```bash
 gcloud compute ssh openclaw-gateway --zone=us-west1-b \
-  --command="sudo docker restart openclaw-gw"
+  --command="cd ~/openclaw && docker compose restart openclaw-gateway"
 ```
 
 The gateway can take 2-3 minutes to become healthy after a restart. Poll with:
@@ -57,8 +57,9 @@ gcloud compute ssh openclaw-gateway --zone=us-west1-b
 
 SSH into the VM, then:
 ```bash
-sudo docker pull ghcr.io/openclaw/openclaw:latest
-sudo docker restart openclaw-gw
+cd ~/openclaw
+docker compose pull openclaw-gateway
+docker compose up -d openclaw-gateway
 ```
 
 ## Start a stopped VM
@@ -77,5 +78,5 @@ gcloud compute ssh openclaw-gateway --zone=us-west1-b \
 If the container didn't start, start it manually:
 ```bash
 gcloud compute ssh openclaw-gateway --zone=us-west1-b \
-  --command="sudo docker start openclaw-gw"
+  --command="cd ~/openclaw && docker compose up -d openclaw-gateway"
 ```

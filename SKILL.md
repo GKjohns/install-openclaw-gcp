@@ -5,7 +5,7 @@ description: Install and deploy an OpenClaw gateway on Google Cloud Platform fro
 
 # Install OpenClaw on GCP
 
-Deploy an OpenClaw gateway on a GCP Debian 12 VM running Docker, accessible through an SSH tunnel. The gateway binds to `127.0.0.1` on the VM so it is never exposed to the public internet.
+Deploy an OpenClaw gateway on a GCP Debian 12 VM running Docker, accessible through an SSH tunnel. Docker compose binds the gateway to `0.0.0.0:18789` on the VM, but GCP's default firewall rules block all inbound traffic except SSH (port 22), so the gateway is not reachable from the public internet without explicit firewall changes.
 
 **End state:** A running OpenClaw gateway you can reach from your local machine at `http://127.0.0.1:18789/` (or a custom local port) through an SSH tunnel.
 
@@ -118,7 +118,14 @@ export OPENCLAW_IMAGE="ghcr.io/openclaw/openclaw:latest"
 ./scripts/docker/setup.sh
 ```
 
-The setup script pulls the Docker image, runs onboarding (token generation, initial config), and starts the container. The container is named `openclaw-gw` and binds port `18789` to `127.0.0.1` on the VM host only.
+The setup script:
+- Pulls the Docker image
+- Runs onboarding (token generation, initial config)
+- Starts the gateway via docker compose
+
+The compose stack creates a container named `openclaw-openclaw-gateway-1` and binds ports 18789-18790 on the VM. The setup script prints the gateway token at the end. Save it.
+
+The setup also configures `gateway.controlUi.allowedOrigins` to `["http://localhost:18789","http://127.0.0.1:18789"]`. If you tunnel to a different local port (e.g., 19000), you must add that origin to the allowlist (see Step 8).
 
 This step takes several minutes for the image pull. Wait for it to finish.
 
@@ -131,12 +138,14 @@ curl -fsS http://127.0.0.1:18789/readyz
 docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' --filter name=openclaw
 ```
 
-Both curl commands should return successful JSON. `docker ps` should show `openclaw-gw` with status `Up`. If they fail, the container may still be starting; wait 2-3 minutes and retry.
+Both curl commands should return successful JSON (`{"ok":true,"status":"live"}` and `{"ready":true}`). `docker ps` should show `openclaw-openclaw-gateway-1` with status `Up`. If they fail, the container may still be starting; wait 2-3 minutes and retry.
 
 ### Step 7: Retrieve the gateway token
 
+The setup script prints the token at the end. If you need to retrieve it again:
+
 ```bash
-sudo docker exec openclaw-gw printenv OPENCLAW_GATEWAY_TOKEN
+docker exec openclaw-openclaw-gateway-1 printenv OPENCLAW_GATEWAY_TOKEN
 ```
 
 Save this token securely. It grants full operator access.
@@ -162,6 +171,27 @@ gcloud compute ssh openclaw-gateway --zone=us-west1-b \
   -- -N -L 19000:127.0.0.1:18789
 ```
 
+**Important:** If you use a non-default tunnel port, you must add it to the gateway's allowed origins on the VM, or the Control UI will reject the connection with "origin not allowed":
+
+```bash
+gcloud compute ssh openclaw-gateway --zone=us-west1-b
+```
+
+On the VM, edit `~/.openclaw/openclaw.json` and add the tunnel origin to `gateway.controlUi.allowedOrigins`:
+```json
+"allowedOrigins": [
+  "http://localhost:18789",
+  "http://127.0.0.1:18789",
+  "http://localhost:19000",
+  "http://127.0.0.1:19000"
+]
+```
+
+Then restart the container:
+```bash
+cd ~/openclaw && docker compose restart openclaw-gateway
+```
+
 Open `http://127.0.0.1:18789/` (or `:19000`) in a browser, paste the gateway token, and click Connect.
 
 ## Post-install configuration
@@ -180,8 +210,8 @@ After the gateway is running and accessible, the user may want to:
 | Machine type | `e2-medium` (2 vCPU, 4 GB RAM) |
 | OS | Debian 12 |
 | Boot disk | 20 GB |
-| Gateway port | `18789` (bound to `127.0.0.1`) |
-| Container name | `openclaw-gw` |
+| Gateway port | `18789` (bound to `0.0.0.0`, protected by GCP firewall) |
+| Container name | `openclaw-openclaw-gateway-1` (docker compose) |
 | Docker image | `ghcr.io/openclaw/openclaw:latest` |
 | Config dir (VM) | `~/.openclaw/` |
 | API keys file (VM) | `~/.openclaw/.env` |

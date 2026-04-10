@@ -23,7 +23,7 @@ Replace placeholders with real keys. Only include providers the user wants to us
 
 Restart the container:
 ```bash
-sudo docker restart openclaw-gw
+cd ~/openclaw && docker compose restart openclaw-gateway
 ```
 
 Wait a couple minutes, then verify:
@@ -55,7 +55,7 @@ If `~/.openclaw/openclaw.json` already exists, merge this into the existing JSON
 
 Restart the container:
 ```bash
-sudo docker restart openclaw-gw
+cd ~/openclaw && docker compose restart openclaw-gateway
 ```
 
 ### Available endpoints

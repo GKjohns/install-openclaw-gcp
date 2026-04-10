@@ -19,4 +19,4 @@ echo ""
 echo "Container status:"
 
 gcloud compute ssh "$INSTANCE" --zone="$ZONE" \
-  --command="sudo docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' --filter name=openclaw"
+  --command="docker ps --format 'table {{.Names}}\t{{.Status}}\t{{.Ports}}' --filter name=openclaw"

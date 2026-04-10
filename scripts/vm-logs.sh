@@ -9,4 +9,4 @@ echo "Fetching last ${LINES} log lines from ${INSTANCE} (${ZONE})..."
 echo ""
 
 gcloud compute ssh "$INSTANCE" --zone="$ZONE" \
-  --command="sudo docker logs openclaw-gw --tail ${LINES}"
+  --command="cd ~/openclaw && docker compose logs --tail ${LINES} openclaw-gateway"
