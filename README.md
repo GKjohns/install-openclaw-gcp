@@ -41,7 +41,8 @@ The skill covers the full process:
 
 ```
 SKILL.md                          Core installation procedure
-references/
+LICENSE.txt                       MIT license
+reference/
   troubleshooting.md              Common problems and diagnostic commands
   optional-config.md              API keys, OpenAI-compatible HTTP API
   day-to-day.md                   Health checks, logs, restarts, updates

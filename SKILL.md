@@ -1,6 +1,7 @@
 ---
 name: install-openclaw-gcp
 description: Install and deploy an OpenClaw gateway on Google Cloud Platform from scratch. Walks through GCP project setup, VM creation, Docker installation, OpenClaw deployment, SSH tunnel configuration, and verification. Use when setting up OpenClaw on GCP, creating a VM for an OpenClaw gateway, deploying OpenClaw to the cloud, or connecting to a remote OpenClaw instance.
+license: MIT
 ---
 
 # Install OpenClaw on GCP
@@ -198,10 +199,10 @@ Open `http://127.0.0.1:18789/` (or `:19000`) in a browser, paste the gateway tok
 
 After the gateway is running and accessible, the user may want to:
 
-- **Add API keys** for model providers (OpenAI, Anthropic, etc.) - see [references/optional-config.md](references/optional-config.md)
-- **Enable the OpenAI-compatible HTTP API** for use with Open WebUI, LobeChat, or custom scripts - see [references/optional-config.md](references/optional-config.md)
-- **Day-to-day operations** (health checks, logs, restarts, updates) - see [references/day-to-day.md](references/day-to-day.md)
-- **Troubleshooting** common problems - see [references/troubleshooting.md](references/troubleshooting.md)
+- **Add API keys** for model providers (OpenAI, Anthropic, etc.) - see [reference/optional-config.md](reference/optional-config.md)
+- **Enable the OpenAI-compatible HTTP API** for use with Open WebUI, LobeChat, or custom scripts - see [reference/optional-config.md](reference/optional-config.md)
+- **Day-to-day operations** (health checks, logs, restarts, updates) - see [reference/day-to-day.md](reference/day-to-day.md)
+- **Troubleshooting** common problems - see [reference/troubleshooting.md](reference/troubleshooting.md)
 
 ## Quick reference
 
